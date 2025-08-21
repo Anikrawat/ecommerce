@@ -8,6 +8,13 @@
       "when": 1755752779353,
       "tag": "0000_slim_shiver_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1755799563945,
+      "tag": "0001_lean_wolf_cub",
+      "breakpoints": true
     }
   ]
 }

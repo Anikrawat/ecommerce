@@ -13,8 +13,10 @@ export const usersTable = pgTable('users', {
   createdAt: date().notNull().defaultNow(),
 })
 //User Relations
-export const userRelation = relations(usersTable, ({ one }) => ({
+export const userRelation = relations(usersTable, ({ one, many }) => ({
   vendor: one(vendorsTable),
+  cart: one(cartTable),
+  order: many(orderTable)
 }))
 
 
@@ -46,6 +48,8 @@ export const categoryRelation = relations(categoryTable, ({ many }) => ({
   product: many(productsTable)
 }))
 
+
+
 //Products Schema
 export const productsStatus = pgEnum('product_status', ['active', 'inactive']);
 export const productsTable = pgTable('products', {
@@ -60,7 +64,7 @@ export const productsTable = pgTable('products', {
   createdAt: date().notNull().defaultNow()
 })
 //Product Relations
-export const productRelation = relations(productsTable, ({ one }) => ({
+export const productRelation = relations(productsTable, ({ one, many }) => ({
   category: one(categoryTable, {
     fields: [productsTable.categoryId],
     references: [categoryTable.id]
@@ -69,6 +73,93 @@ export const productRelation = relations(productsTable, ({ one }) => ({
     fields: [productsTable.vendorId],
     references: [vendorsTable.id]
   }),
-  orderitems: many(ordersItemsTable),
-  cartitems: many(cartsItemsTable)
+  orderitems: many(orderItemsTable),
+  cartitems: many(cartItemsTable)
+}))
+
+
+
+//Cart Schema
+export const cartTable = pgTable('carts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  createdAt: date().notNull().defaultNow(),
+  userId: uuid('user_id').notNull().references(() => usersTable.id),
+})
+//Cart Relations
+export const cartRelation = relations(cartTable, ({ one, many }) => ({
+  user: one(usersTable, {
+    fields: [cartTable.userId],
+    references: [usersTable.id]
+  }),
+  cart_item: many(cartItemsTable),
+  order: many(orderTable)
+}))
+
+
+
+//Cart Items Table
+export const cartItemsTable = pgTable('cart_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  quantity: integer().notNull(),
+  cartId: uuid('cart_id').notNull().references(() => cartTable.id),
+  productId: uuid('product_id').notNull().references(() => productsTable.id)
+})
+//Cart Items Relations
+export const cartItemsRelation = relations(cartItemsTable, ({ one }) => ({
+  cart: one(cartTable, {
+    fields: [cartItemsTable.cartId],
+    references: [cartTable.id]
+  }),
+  product: one(productsTable, {
+    fields: [cartItemsTable.productId],
+    references: [productsTable.id]
+  })
+}))
+
+
+
+//Order Table
+export const orderStatus = pgEnum('order_status', ['completed', 'pending'])
+export const orderTable = pgTable('orders', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  cartId: uuid('cart_id').notNull().references(() => cartTable.id),
+  orderDate: date().notNull().defaultNow(),
+  status: orderStatus('status').notNull().default('pending'),
+  totalAmount: integer().notNull(),
+  userId: uuid('user_id').notNull().references(() => usersTable.id)
+})
+//Order relations
+export const orderRelations = relations(orderTable, ({ many, one }) => ({
+  cart: one(cartTable, {
+    fields: [orderTable.cartId],
+    references: [cartTable.id]
+  }),
+  user: one(usersTable, {
+    fields: [orderTable.userId],
+    references: [usersTable.id]
+  }),
+  order_item: many(orderItemsTable)
+}))
+
+
+
+//Order Items Table
+export const orderItemsTable = pgTable('order_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  orderId: uuid('order_id').notNull().references(() => orderTable.id),
+  quantity: integer().notNull(),
+  price: integer().notNull(),
+  productId: uuid('product_id').notNull().references(() => productsTable.id)
+})
+
+//Order Items Relations
+export const orderItemsRelations = relations(orderItemsTable, ({ one }) => ({
+  order: one(orderTable, {
+    fields: [orderItemsTable.orderId],
+    references: [orderTable.id]
+  }),
+  product: one(productsTable, {
+    fields: [orderItemsTable.productId],
+    references: [productsTable.id]
+  })
 }))
