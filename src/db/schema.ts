@@ -6,9 +6,8 @@ import { date, pgEnum, pgTable, uuid, varchar, integer } from 'drizzle-orm/pg-co
 export const userRole = pgEnum("user_role", ['vendor', 'customer']);
 export const usersTable = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
-  name: varchar({ length: 255 }).notNull(),
+  username: varchar({ length: 255 }).notNull().unique(),
   email: varchar({ length: 255 }).notNull().unique(),
-  password: varchar({ length: 255 }),
   role: userRole("role").notNull().default('customer'),
   createdAt: date().notNull().defaultNow(),
 })

@@ -15,6 +15,34 @@
       "when": 1755799563945,
       "tag": "0001_lean_wolf_cub",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1755833936817,
+      "tag": "0002_real_metal_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1755835864023,
+      "tag": "0003_majestic_spitfire",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1755840864841,
+      "tag": "0004_talented_mandarin",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1755843390800,
+      "tag": "0005_clear_plazm",
+      "breakpoints": true
     }
   ]
 }

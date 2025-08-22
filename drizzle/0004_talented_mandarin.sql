@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "profile" varchar DEFAULT '../../public/vercel.svg' NOT NULL;
