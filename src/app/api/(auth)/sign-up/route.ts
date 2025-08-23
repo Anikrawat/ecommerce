@@ -3,14 +3,34 @@ import dbConnect from "@/utils/drizzle/connect";
 import { usersTable } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import { serverClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 const db = dbConnect();
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, username } = await request.json()
+    const { provider, email, password, username } = await request.json()
     const userExists = await db.select({ email: usersTable.email, username: usersTable.username }).from(usersTable).where(or(eq(usersTable.email, email), eq(usersTable.username, username)));
 
+    const supabase = await serverClient();
+
+    if (provider === "google") {
+      const redirectUrl = new URL('http://localhost:3000/auth/callback')
+      redirectUrl.searchParams.set('username', username)
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectUrl.toString(), // must exist in Supabase + Google Console
+        },
+      });
+      if (data.url) redirect(data.url);
+      if (error) throw error;
+
+      return NextResponse.json({
+        message: "Redirecting to Google OAuth...",
+        url: data.url,
+      });
+    }
     if (userExists.length > 0) {
       const user = userExists[0]
       if (user.username === username) {
@@ -24,12 +44,14 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
     }
-    const supabase = await serverClient();
 
 
     const { data: insertData, error: insertError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: 'http://localhost:3000/email-verify'
+      }
     })
 
     if (insertError) throw insertError

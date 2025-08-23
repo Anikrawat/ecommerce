@@ -5,7 +5,7 @@ import { date, pgEnum, pgTable, uuid, varchar, integer } from 'drizzle-orm/pg-co
 //User Schema
 export const userRole = pgEnum("user_role", ['vendor', 'customer']);
 export const usersTable = pgTable('users', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   username: varchar({ length: 255 }).notNull().unique(),
   email: varchar({ length: 255 }).notNull().unique(),
   role: userRole("role").notNull().default('customer'),
