@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const supabase = await serverClient();
 
     if (provider === "google") {
-      const redirectUrl = new URL('http://localhost:3000/auth/callback')
+      const redirectUrl = new URL('http://localhost:3000/api/callback')
       redirectUrl.searchParams.set('username', username)
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",

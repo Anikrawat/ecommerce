@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-// The client you created from the Server-Side Auth instructions
 import { serverClient } from '@/utils/supabase/server'
 import dbConnect from '@/utils/drizzle/connect'
 import { usersTable } from '@/db/schema'
@@ -22,15 +21,22 @@ export async function GET(request: Request) {
     const supabase = await serverClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error && data.session?.user) {
+      if (!data.session.user.email) {
+        throw new Error("Supabase did not return an email");
+      }
+
+      if (!username) {
+        throw new Error("Username missing from query params");
+      }
       const existingUser = await db.select()
         .from(usersTable)
         .where(eq(usersTable.id, data.session.user.id));
 
       if (existingUser.length === 0) {
         await db.insert(usersTable).values({
-          id: data.session?.user.id,
+          id: data.session.user.id,
           email: data.session.user.email,
-          username: username, // Use username from URL params
+          username
         });
       }
     }
@@ -46,8 +52,6 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}${next}`)
       }
     }
-
-
   }
 
   // return the user to an error page with instructions

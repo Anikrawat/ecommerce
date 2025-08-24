@@ -10,12 +10,19 @@
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
+    "clsx": "^2.1.1",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.4",
+    "motion": "^12.0.0-alpha.1",
     "next": "15.5.0",
     "postgres": "^3.4.7",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "tailwind-merge": "^3.3.1"
+  },
+  "overrides":{
+    "motion>react": "19.1.0",
+    "motion>react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
