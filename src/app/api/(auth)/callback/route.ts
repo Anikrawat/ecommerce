@@ -28,16 +28,22 @@ export async function GET(request: Request) {
       if (!username) {
         throw new Error("Username missing from query params");
       }
-      const existingUser = await db.select()
-        .from(usersTable)
-        .where(eq(usersTable.id, data.session.user.id));
 
-      if (existingUser.length === 0) {
+      const userExists = await db.select({ email: usersTable.email, username: usersTable.username }).from(usersTable).where(or(eq(usersTable.email, email), eq(usersTable.username, username)));
+
+
+      if (userExists.length === 0) {
         await db.insert(usersTable).values({
           id: data.session.user.id,
           email: data.session.user.email,
           username
         });
+      } else {
+        if (userExists[0].username === username) {
+          throw new Error("username already exists")
+        } else if (userExists[0].email === data.session.user.email) {
+          throw new Error("Email already exists")
+        }
       }
     }
     if (!error) {

@@ -3,7 +3,6 @@ import dbConnect from "@/utils/drizzle/connect";
 import { usersTable } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import { serverClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 
 const db = dbConnect();
 
@@ -11,6 +10,8 @@ export async function POST(request: NextRequest) {
   try {
     const { provider, email, password, username } = await request.json()
     const userExists = await db.select({ email: usersTable.email, username: usersTable.username }).from(usersTable).where(or(eq(usersTable.email, email), eq(usersTable.username, username)));
+
+    console.log(username, email, password, provider)
 
     const supabase = await serverClient();
 
@@ -23,7 +24,6 @@ export async function POST(request: NextRequest) {
           redirectTo: redirectUrl.toString(), // must exist in Supabase + Google Console
         },
       });
-      if (data.url) redirect(data.url);
       if (error) throw error;
 
       return NextResponse.json({
@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : String(error);
+    console.log(error)
     return NextResponse.json({
       message: "Internal Server Error: " + message
     }, { status: 500 })
